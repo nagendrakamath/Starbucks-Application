@@ -18,7 +18,6 @@ pipeline {
         stage("Install NPM Dependencies") {
             steps {
                 sh "npm install"
-                sh "npm audit fix --force"
             }
         }
         stage("Build Docker Image") {
