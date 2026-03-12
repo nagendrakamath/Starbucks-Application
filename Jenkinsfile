@@ -15,6 +15,24 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/nagendrakamath/Starbucks-Application.git'
             }
         }
+        stage('Debug Docker Environment') {
+            steps {
+                // lightweight diagnostics to see where docker is available
+                sh '''
+                echo '--- which docker ---'
+                which docker || echo 'docker not found on agent PATH'
+                echo '--- docker --version ---'
+                docker --version || true
+                echo '--- ls /var/run/docker.sock ---'
+                ls -l /var/run/docker.sock || true
+                echo '--- uname & whoami ---'
+                uname -a || true
+                whoami || true
+                echo '--- env DOCKER variables ---'
+                env | grep -i docker || true
+                '''
+            }
+        }
         stage("Install NPM Dependencies") {
             steps {
                 sh "npm install"
