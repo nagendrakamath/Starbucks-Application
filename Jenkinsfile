@@ -21,16 +21,30 @@ pipeline {
             }
         }
         stage("Build Docker Image") {
+            // run this stage inside a container that has the docker CLI and access to host docker daemon
+            agent {
+                docker {
+                    image 'docker:24.0.2'
+                    // allow the container to talk to the host docker daemon
+                    args '--privileged -v /var/run/docker.sock:/var/run/docker.sock'
+                }
+            }
             steps {
-                sh "docker build -t starbucks ."
+                sh 'docker build -t starbucks .'
             }
         }
         stage("Tag & Push to DockerHub") {
+            agent {
+                docker {
+                    image 'docker:24.0.2'
+                    args '--privileged -v /var/run/docker.sock:/var/run/docker.sock'
+                }
+            }
             steps {
                 script {
                     withDockerRegistry(credentialsId: 'docker') {
-                        sh "docker tag starbucks nagendrakamath/starbucks:latest"
-                        sh "docker push nagendrakamath/starbucks:latest"
+                        sh 'docker tag starbucks nagendrakamath/starbucks:latest'
+                        sh 'docker push nagendrakamath/starbucks:latest'
                     }
                 }
             }
